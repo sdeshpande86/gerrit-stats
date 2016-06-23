@@ -22,8 +22,6 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 
@@ -38,7 +36,7 @@ public class FetchGerritStatsUtility {
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
                 new AuthScope(target.getHostName(), target.getPort()),
-                new UsernamePasswordCredentials("henry.wu", "/OUg5qLuAlXmjE+zRF3iuDgFXQx2zsWhmjdQYAVquw"));
+                new UsernamePasswordCredentials("gerrit user name", "gerrit http password"));
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setDefaultCredentialsProvider(credsProvider)
                 .build();
@@ -67,24 +65,24 @@ public class FetchGerritStatsUtility {
         return json;
     }
 
-    public static Map<String, List<Integer>> getUserCommitsHistoryMap(JsonArray jsonArray) {
-        Map<String, List<Integer>> userCommitHistoryMap = new HashMap<String, List<Integer>>();
+    public static Map<String, CommitsStats> getUserCommitsHistoryMap(JsonArray jsonArray) {
+        Map<String, CommitsStats> userCommitHistoryMap = new HashMap<String, CommitsStats>();
         for (JsonElement applicationJsonElement : jsonArray) {
             String date = applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("created").getAsString();
             String day = date.substring(0, date.indexOf(" "));
             if (!userCommitHistoryMap.containsKey(day)) {
-                List<Integer> elementList = new LinkedList<Integer>();
-                elementList.add(1);
-                elementList.add(applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("insertions").getAsInt());
-                elementList.add(applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("deletions").getAsInt());
-                userCommitHistoryMap.put(day, elementList);
+                CommitsStats commitsStats =
+                        new CommitsStats(1,
+                                applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("insertions").getAsInt(),
+                                applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("deletions").getAsInt());
+                userCommitHistoryMap.put(day, commitsStats);
             } else {
-                List<Integer> elementList = userCommitHistoryMap.get(day);
-                elementList.set(0, elementList.get(0) + 1);
-                elementList.set(1, elementList.get(1) + applicationJsonElement.getAsJsonObject()
-                        .getAsJsonPrimitive("insertions").getAsInt());
-                elementList.set(2, elementList.get(2) + applicationJsonElement.getAsJsonObject()
-                        .getAsJsonPrimitive("deletions").getAsInt());
+                CommitsStats commitsStats = userCommitHistoryMap.get(day);
+                commitsStats.setNumOfCommits(commitsStats.getNumOfCommits() + 1);
+                commitsStats.setLinesOfInsertion(commitsStats.getLinesOfInsertion()
+                        + applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("insertions").getAsInt());
+                commitsStats.setLinesOfDeletion(commitsStats.getLinesOfDeletion()
+                        + applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("deletions").getAsInt());
             }
         }
         return userCommitHistoryMap;

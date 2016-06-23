@@ -25,6 +25,4 @@ public class FetchGerritStatsServlet extends HttpServlet {
         response.getWriter().println(jsonArray.getAsString());
         FetchGerritStatsUtility.getUserCommitsHistoryMap(jsonArray);
     }
-
-
 }
