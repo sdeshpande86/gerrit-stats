@@ -94,7 +94,7 @@
 
 
             // Set chart options
-            var lineChartOptions = {'title':'How Much commits',
+            var lineChartOptions = {'title':'Lines Modified(Insert & Delete) vs Time',
                                        'width':500,
                                        'height':300};
 
@@ -185,12 +185,34 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 var year;
+                var option = 0;
 
                 $('#myForm').validator();
 
+                $('#granular').on('change', function() {
+                    option = this.value;
+                    if(option == 1)
+                    {
+                        $('#yearSelect').val(0);
+                        $("#monthsSelect").prop("disabled", false);
+                    }
+                    if(option == 2)
+                    {
+                        $('#yearSelect').val(0);
+                        $("#monthsSelect").prop("disabled", true);
+                        document.getElementById('date').innerHTML = "";
+                    }
+
+                });
+
                 $('#yearSelect').on('change', function() {
                     year = this.value;
-                    $("#monthsSelect").prop("disabled", false);
+
+                    if(option == 2)
+                    {
+                        alert("Quarter wise granularity in progress");
+                        //$("#monthsSelect").prop("disabled", false);
+                    }
                 });
 
                 $('#monthsSelect').on('change', function() {
@@ -207,6 +229,8 @@
 
                     var date;
                     var day;
+
+                    document.getElementById('date').innerHTML = "<h3>"+$('#monthsSelect option:selected').text() +" "+ year+"</h3>";
 
                     for(i=1 ; i<days; i++)
                     {
@@ -289,9 +313,13 @@
         <div class="container">
         <div class="row">
 
-            <div class="col-xs-5" id="chart_div"></div>
-            <div class="col-xs-2" id="selectItems">
+            <div class="col-xs-3" id="selectItems">
 
+                <select id="granular">
+                    <option value="0" selected="selected">Granularity</option>
+                    <option value="1">Month Wise</option>
+                    <option value="2">Quarter Wise</option>
+                </select>
                 <select id="yearSelect">
                   <option value="0" selected="selected">Year</option>
                   <option value="2016">2016</option>
@@ -314,9 +342,13 @@
                   <option value="11">Nov</option>
                   <option value="12">Dec</option>
                 </select>
+                <br/>
+                <p id="date">
+                </p>
 
             </div>
-            <div class="col-xs-5" id="line_chart_div"></div>
+            <div class="col-xs-5" id="chart_div"></div>
+            <div class="col-xs-4" id="line_chart_div"></div>
         </div>
         <div class="row">
             <div class="col-md-4" id="java_div"></div>
