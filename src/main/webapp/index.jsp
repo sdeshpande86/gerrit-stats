@@ -190,6 +190,7 @@
 
                 $('#yearSelect').on('change', function() {
                     year = this.value;
+                    $("#monthsSelect").prop("disabled", false);
                 });
 
                 $('#monthsSelect').on('change', function() {
@@ -235,6 +236,8 @@
                     //    alert( months[this.value] );
 
                     callMap();
+                    $('#yearSelect').val(0);
+                    $('#monthsSelect').val(0);
 
                 });
 
@@ -253,7 +256,7 @@
             %>
                     username = "<%= user %>";
             <%
-                    Map<String, CommitsStats> result = EntryPoint.getResult(user);
+                    Map<String, CommitsStats> result = EntryPoint.getResultByUser(user);
                     if(result != null)
                     {
                         for(Map.Entry<String, CommitsStats> e : result.entrySet())
@@ -289,14 +292,14 @@
             <div class="col-xs-5" id="chart_div"></div>
             <div class="col-xs-2" id="selectItems">
 
-                    <select id="yearSelect">
-                      <option value="0" selected="selected">Year</option>
-                      <option value="2016">2016</option>
-                      <option value="2015">2015</option>
-                      <option value="2014">2014</option>
-                      <option value="2013">2013</option>
-                    </select>
-                <select id="monthsSelect">
+                <select id="yearSelect">
+                  <option value="0" selected="selected">Year</option>
+                  <option value="2016">2016</option>
+                  <option value="2015">2015</option>
+                  <option value="2014">2014</option>
+                  <option value="2013">2013</option>
+                </select>
+                <select id="monthsSelect" disabled>
                   <option value="0" selected="selected">Months</option>
                   <option value="1">Jan</option>
                   <option value="2">Feb</option>

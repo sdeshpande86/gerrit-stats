@@ -22,4 +22,17 @@ public class EntryPoint {
             return FetchGerritStatsUtility.getUserCommitsMonthHistoryMap(jsonArray, year, month);
         return null;
     }
+
+    public static Map<String, CommitsStats> getResultByUser(String user) {
+        JsonArray jsonArray = null;
+        try {
+            jsonArray = FetchGerritStatsUtility.readGetUrl("http://gerrit.corp.appdynamics.com:8080/a/changes/" +
+                    "?q=owner:" +user+ "+and+status:merged+and+project:codebase");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(jsonArray != null)
+            return FetchGerritStatsUtility.getUserCommitsHistoryMap(jsonArray);
+        return null;
+    }
 }
