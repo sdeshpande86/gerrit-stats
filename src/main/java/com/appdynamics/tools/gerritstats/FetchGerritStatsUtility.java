@@ -36,7 +36,7 @@ public class FetchGerritStatsUtility {
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
                 new AuthScope(target.getHostName(), target.getPort()),
-                new UsernamePasswordCredentials("gerrit user name", "gerrit http password"));
+                new UsernamePasswordCredentials("henry.wu", "/OUg5qLuAlXmjE+zRF3iuDgFXQx2zsWhmjdQYAVquw"));
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setDefaultCredentialsProvider(credsProvider)
                 .build();

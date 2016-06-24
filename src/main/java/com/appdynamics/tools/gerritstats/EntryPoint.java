@@ -18,6 +18,8 @@ public class EntryPoint {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return FetchGerritStatsUtility.getUserCommitsHistoryMap(jsonArray);
+        if(jsonArray != null)
+            return FetchGerritStatsUtility.getUserCommitsHistoryMap(jsonArray);
+        return null;
     }
 }
