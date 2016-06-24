@@ -21,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ public class FetchGerritStatsUtility {
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
                 new AuthScope(target.getHostName(), target.getPort()),
-                new UsernamePasswordCredentials("henry.wu", "/OUg5qLuAlXmjE+zRF3iuDgFXQx2zsWhmjdQYAVquw"));
+                new UsernamePasswordCredentials("username", "http password"));
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setDefaultCredentialsProvider(credsProvider)
                 .build();
@@ -68,7 +69,7 @@ public class FetchGerritStatsUtility {
     public static Map<String, CommitsStats> getUserCommitsHistoryMap(JsonArray jsonArray) {
         Map<String, CommitsStats> userCommitHistoryMap = new HashMap<String, CommitsStats>();
         for (JsonElement applicationJsonElement : jsonArray) {
-            String date = applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("created").getAsString();
+            String date = applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("updated").getAsString();
             String day = date.substring(0, date.indexOf(" "));
             if (!userCommitHistoryMap.containsKey(day)) {
                 CommitsStats commitsStats =
@@ -78,6 +79,38 @@ public class FetchGerritStatsUtility {
                 userCommitHistoryMap.put(day, commitsStats);
             } else {
                 CommitsStats commitsStats = userCommitHistoryMap.get(day);
+                commitsStats.setNumOfCommits(commitsStats.getNumOfCommits() + 1);
+                commitsStats.setLinesOfInsertion(commitsStats.getLinesOfInsertion()
+                        + applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("insertions").getAsInt());
+                commitsStats.setLinesOfDeletion(commitsStats.getLinesOfDeletion()
+                        + applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("deletions").getAsInt());
+            }
+        }
+        return userCommitHistoryMap;
+    }
+
+    public static Map<String, CommitsStats> getUserCommitsMonthHistoryMap(JsonArray jsonArray, int year, int month) {
+        if (year < 0 || month > 12 || month < 1) {
+            throw new RuntimeException("Year and month not correct");
+        }
+        if (jsonArray == null) {
+            throw new RuntimeException("jsonArray is null");
+        }
+        YearMonth yearMonth = YearMonth.of(year, month);
+        int daysInMonth = yearMonth.lengthOfMonth();
+        Map<String, CommitsStats> userCommitHistoryMap = new HashMap<String, CommitsStats>();
+        for (int i = 1; i <= daysInMonth; i++) {
+            CommitsStats commitsStats = new CommitsStats(0, 0, 0);
+            String date = year + "-"
+                    + ((month >= 10) ? Integer.toString(month) : ("0" + Integer.toString(month))) + "-"
+                    + ((i >= 10) ? Integer.toString(i) : ("0" + Integer.toString(i)));
+            userCommitHistoryMap.put(date, commitsStats);
+        }
+        for (JsonElement applicationJsonElement : jsonArray) {
+            String dateString = applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("updated").getAsString();
+            String DateInDay = dateString.substring(0, dateString.indexOf(" "));
+            if (userCommitHistoryMap.containsKey(DateInDay)) {
+                CommitsStats commitsStats = userCommitHistoryMap.get(DateInDay);
                 commitsStats.setNumOfCommits(commitsStats.getNumOfCommits() + 1);
                 commitsStats.setLinesOfInsertion(commitsStats.getLinesOfInsertion()
                         + applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("insertions").getAsInt());

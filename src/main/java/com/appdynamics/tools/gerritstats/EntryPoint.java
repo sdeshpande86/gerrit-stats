@@ -7,10 +7,10 @@ import java.util.Map;
 
 public class EntryPoint {
     public static void main(String[] args) throws Exception {
-        getResult("Henry");
+        getResult("Henry", 2015, 7);
     }
 
-    public static Map<String, CommitsStats> getResult(String user) {
+    public static Map<String, CommitsStats> getResult(String user, int year, int month) {
         JsonArray jsonArray = null;
         try {
             jsonArray = FetchGerritStatsUtility.readGetUrl("http://gerrit.corp.appdynamics.com:8080/a/changes/" +
@@ -19,7 +19,7 @@ public class EntryPoint {
             e.printStackTrace();
         }
         if(jsonArray != null)
-            return FetchGerritStatsUtility.getUserCommitsHistoryMap(jsonArray);
+            return FetchGerritStatsUtility.getUserCommitsMonthHistoryMap(jsonArray, year, month);
         return null;
     }
 }
