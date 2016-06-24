@@ -37,7 +37,7 @@ public class FetchGerritStatsUtility {
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
                 new AuthScope(target.getHostName(), target.getPort()),
-                new UsernamePasswordCredentials("username", "http password"));
+                new UsernamePasswordCredentials("henry.wu", "/OUg5qLuAlXmjE+zRF3iuDgFXQx2zsWhmjdQYAVquw"));
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setDefaultCredentialsProvider(credsProvider)
                 .build();
@@ -111,6 +111,68 @@ public class FetchGerritStatsUtility {
             String DateInDay = dateString.substring(0, dateString.indexOf(" "));
             if (userCommitHistoryMap.containsKey(DateInDay)) {
                 CommitsStats commitsStats = userCommitHistoryMap.get(DateInDay);
+                commitsStats.setNumOfCommits(commitsStats.getNumOfCommits() + 1);
+                commitsStats.setLinesOfInsertion(commitsStats.getLinesOfInsertion()
+                        + applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("insertions").getAsInt());
+                commitsStats.setLinesOfDeletion(commitsStats.getLinesOfDeletion()
+                        + applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("deletions").getAsInt());
+            }
+        }
+        return userCommitHistoryMap;
+    }
+
+    public static Map<String, CommitsStats> getUserCommitsQuarterHistoryMap(JsonArray jsonArray, int year, int quarter) {
+        if (year < 0 || quarter > 4 || quarter < 1) {
+            throw new RuntimeException("Year and quarter not correct");
+        }
+        if (jsonArray == null) {
+            throw new RuntimeException("jsonArray is null");
+        }
+        Map<String, CommitsStats> userCommitHistoryMap = new HashMap<String, CommitsStats>();
+        for (int i = 1; i <= 4; i++) {
+            CommitsStats commitsStats = new CommitsStats(0, 0, 0);
+            String quarterString;
+            switch (i) {
+                case 1:
+                    quarterString = "1st Quarter";
+                    break;
+                case 2:
+                    quarterString = "2nd Quarter";
+                    break;
+                case 3:
+                    quarterString = "3rd Quarter";
+                    break;
+                case 4:
+                    quarterString = "4th Quarter";
+                    break;
+                default:
+                    quarterString = "Invalid month";
+                    break;
+            }
+            userCommitHistoryMap.put(quarterString, commitsStats);
+        }
+        for (JsonElement applicationJsonElement : jsonArray) {
+            String dateString = applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("updated").getAsString();
+            String DateInDay = dateString.substring(0, dateString.indexOf(" "));
+            String[] dateArray = DateInDay.split("-");
+            int yearFromJson = Integer.parseInt(dateArray[0]);
+            if (yearFromJson != year) {
+                continue;
+            }
+            int monthFromJson = Integer.parseInt(dateArray[1]);
+            String quarterString = null;
+            if (monthFromJson >= 1 && monthFromJson <= 3) {
+                quarterString = "1st Quarter";
+            } else if (monthFromJson >= 4 && monthFromJson <= 6) {
+                quarterString = "2nd Quarter";
+            } else if (monthFromJson >= 7 && monthFromJson <= 9) {
+                quarterString = "3nd Quarter";
+            } else if (monthFromJson >= 10 && monthFromJson <= 12) {
+                quarterString = "4th Quarter";
+            }
+
+            if (userCommitHistoryMap.containsKey(quarterString)) {
+                CommitsStats commitsStats = userCommitHistoryMap.get(quarterString);
                 commitsStats.setNumOfCommits(commitsStats.getNumOfCommits() + 1);
                 commitsStats.setLinesOfInsertion(commitsStats.getLinesOfInsertion()
                         + applicationJsonElement.getAsJsonObject().getAsJsonPrimitive("insertions").getAsInt());
