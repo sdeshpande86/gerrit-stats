@@ -230,7 +230,7 @@
                     var date;
                     var day;
 
-                    document.getElementById('date').innerHTML = "<h3>"+$('#monthsSelect option:selected').text() +" "+ year+"</h3>";
+                    document.getElementById('date').innerHTML = "<h3>"+username+"<br/>"+$('#monthsSelect option:selected').text() +" "+ year+"</h3>";
 
                     for(i=1 ; i<days; i++)
                     {
@@ -260,7 +260,7 @@
                     //    alert( months[this.value] );
 
                     callMap();
-                    $('#yearSelect').val(0);
+                    //$('#yearSelect').val(0);
                     $('#monthsSelect').val(0);
 
                 });
@@ -295,7 +295,6 @@
                             dataMap.set(str, arr);
                             copyDataMap.set(str, arr);
                             arr = [];
-
                     <%
                         }
                     }
@@ -316,19 +315,19 @@
             <div class="col-xs-3" id="selectItems">
 
                 <select id="granular">
-                    <option value="0" selected="selected">Granularity</option>
-                    <option value="1">Month Wise</option>
+                    <option value="0">Granularity</option>
+                    <option value="1" selected="selected">Month Wise</option>
                     <option value="2">Quarter Wise</option>
                 </select>
                 <select id="yearSelect">
-                  <option value="0" selected="selected">Year</option>
+                  <option value="0"  selected="selected">Year</option>
                   <option value="2016">2016</option>
                   <option value="2015">2015</option>
                   <option value="2014">2014</option>
                   <option value="2013">2013</option>
                 </select>
-                <select id="monthsSelect" disabled>
-                  <option value="0" selected="selected">Months</option>
+                <select id="monthsSelect">
+                  <option value="0"  selected="selected">Months</option>
                   <option value="1">Jan</option>
                   <option value="2">Feb</option>
                   <option value="3">Mar</option>
